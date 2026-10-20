@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "AFP-CAE: Convolutional Autoencoder for Defect Detection in Automated Fiber Placement"
+version: 0.1.0
+date-released: 2026-10-16
+type: software
+authors:
+  - family-names: Marinin
+    given-names: Vladimir I.
+    affiliation: "Platov South-Russian State Polytechnic University (NPI)"
+  - family-names: Zaytsev
+    given-names: Roman G.
+    affiliation: "Platov South-Russian State Polytechnic University (NPI)"
+    email: rzajtsev@gmail.com
+  - family-names: Savin
+    given-names: Alexander G.
+    affiliation: "Platov South-Russian State Polytechnic University (NPI)"
+keywords:
+  - automated fiber placement
+  - defect detection
+  - convolutional autoencoder
+  - anomaly detection
+  - polymer composites
