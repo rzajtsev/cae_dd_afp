@@ -1,0 +1,21 @@
+{
+ "backend": "ONNX Runtime CPUExecutionProvider, FP32",
+ "intra_op_threads": 2,
+ "max_abs_diff_vs_jax": 1.0132789611816406e-06,
+ "tile_latency_ms_median_p95": [
+  0.657884499901229,
+  0.922661149934356
+ ],
+ "frame_cae_latency_ms_median_p95": [
+  86.90604099990651,
+  99.85082219996002
+ ],
+ "frame_pipeline_ms_median_p95": [
+  121.45854050004345,
+  139.86229315000855
+ ],
+ "onnx_size_MB": 0.7242393493652344,
+ "tiles_per_s": 1852.5754728623895,
+ "frames_per_s": 8.233262114652549,
+ "max_layup_speed_m_min": 12.646290608106316
+}

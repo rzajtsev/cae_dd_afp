@@ -1,0 +1,65 @@
+{
+ "quality": {
+  "tau": 0.10810305923223495,
+  "tile_auroc": 0.9874376024007774,
+  "tile_ap": 0.8837404048081856,
+  "tile_precision": 0.8284383228681386,
+  "tile_recall": 0.8707685756866085,
+  "tile_f1": 0.8490761884990657,
+  "n_tiles": 91770,
+  "n_defective_tiles": 4697,
+  "pixel_auroc": 0.9767483771859999,
+  "instance_recall": 0.8738095238095238,
+  "recall_by_type": {
+   "gap": 1.0,
+   "overlap": 1.0,
+   "twist": 0.9666666666666667,
+   "fod": 0.75,
+   "fuzzball": 0.6,
+   "wrinkle": 0.8,
+   "missing_tow": 1.0
+  },
+  "iou_by_type": {
+   "gap": 0.6339353525788379,
+   "overlap": 0.8862126602915757,
+   "twist": 0.19984970045913902,
+   "fod": 0.44479157231458877,
+   "fuzzball": 0.23712348329384575,
+   "wrinkle": 0.33269407578932825,
+   "missing_tow": 0.7144252235422744
+  },
+  "mean_iou": 0.5182208681253788,
+  "test_frames": 570,
+  "normal_test_frames": 150,
+  "course_length_m": 14.592,
+  "false_alarms_far": 5,
+  "false_alarms_per_m": 0.3426535087719298,
+  "components_outside_mask": 156,
+  "false_alarms_on_normal_frames": 0
+ },
+ "benchmark_jax": {
+  "backend": "JAX/XLA, FP32",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cpu_count": 2,
+  "params": 189297,
+  "size_MB_fp32": 0.7221107482910156,
+  "MMAC_per_tile": 24.9856,
+  "GFLOP_per_frame": 8.0453632,
+  "tiles_per_frame": 161,
+  "tile_latency_ms_median_p95": [
+   1.0976384999707989,
+   1.6621015999874083
+  ],
+  "frame_cae_latency_ms_median_p95": [
+   137.3364624998885,
+   155.80221390001725
+  ],
+  "frame_pipeline_ms_median_p95": [
+   167.1908229999417,
+   191.2351605999845
+  ],
+  "frames_per_s": 5.981189529764733,
+  "max_layup_speed_m_min": 9.18710711771863,
+  "tiles_per_s": 1172.3033859280501
+ }
+}

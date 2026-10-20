@@ -1,0 +1,12 @@
+{
+ "tau": 0.10810305923223495,
+ "calibration": "max of A over 100 defect-free validation frames (seed 1)",
+ "pipeline": {
+  "tile": 64,
+  "stride": 32,
+  "sigma": 3.0,
+  "edge": 12,
+  "min_area": 20,
+  "px_mm": 0.1
+ }
+}
