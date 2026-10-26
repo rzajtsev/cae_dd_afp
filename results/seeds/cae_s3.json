@@ -1,0 +1,65 @@
+{
+ "quality": {
+  "tau": 0.10123678296804428,
+  "tile_auroc": 0.9892313640173218,
+  "tile_ap": 0.8971936489748639,
+  "tile_precision": 0.8228222309814742,
+  "tile_recall": 0.8888652331275282,
+  "tile_f1": 0.854569644867465,
+  "n_tiles": 91770,
+  "n_defective_tiles": 4697,
+  "pixel_auroc": 0.9802912915075086,
+  "instance_recall": 0.8976190476190476,
+  "recall_by_type": {
+   "gap": 1.0,
+   "overlap": 1.0,
+   "twist": 0.9666666666666667,
+   "fod": 0.8333333333333334,
+   "fuzzball": 0.65,
+   "wrinkle": 0.8333333333333334,
+   "missing_tow": 1.0
+  },
+  "iou_by_type": {
+   "gap": 0.6341386404270174,
+   "overlap": 0.8829639785750001,
+   "twist": 0.22307309567867306,
+   "fod": 0.4758666495239985,
+   "fuzzball": 0.2841685836494333,
+   "wrinkle": 0.3901674427323317,
+   "missing_tow": 0.743886652994568
+  },
+  "mean_iou": 0.538413462186479,
+  "test_frames": 570,
+  "normal_test_frames": 150,
+  "course_length_m": 14.592,
+  "false_alarms_far": 7,
+  "false_alarms_per_m": 0.47971491228070173,
+  "components_outside_mask": 81,
+  "false_alarms_on_normal_frames": 1
+ },
+ "benchmark_jax": {
+  "backend": "JAX/XLA, FP32",
+  "cpu": "AMD Ryzen 9 7900X 12-Core Processor",
+  "cpu_count": 24,
+  "params": 189297,
+  "size_MB_fp32": 0.7221107482910156,
+  "MMAC_per_tile": 24.9856,
+  "GFLOP_per_frame": 8.0453632,
+  "tiles_per_frame": 161,
+  "tile_latency_ms_median_p95": [
+   1.475888000015857,
+   2.5880959499261276
+  ],
+  "frame_cae_latency_ms_median_p95": [
+   3.300532500020381,
+   3.8194200499788167
+  ],
+  "frame_pipeline_ms_median_p95": [
+   22.06649749996359,
+   24.900108399941686
+  ],
+  "frames_per_s": 45.31756795575057,
+  "max_layup_speed_m_min": 69.60778438003287,
+  "tiles_per_s": 48780.007468190604
+ }
+}

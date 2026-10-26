@@ -79,11 +79,15 @@ def fuse(per_tile, shape, ys, xs, size):
     return acc / np.maximum(cnt, 1)
 
 
-def anomaly_map(frame, predict, cfg: PipelineConfig = DEFAULT, return_recon=False):
-    """Smoothed residual map A for a pre-processed frame (float32 [H, W] in [0, 1])."""
+def anomaly_map(frame, predict, cfg: PipelineConfig = DEFAULT, return_recon=False, kind="residual"):
+    """Smoothed residual map A for a pre-processed frame (float32 [H, W] in [0, 1]).
+
+    kind='residual': `predict` returns reconstructions and A = G_sigma * |x - x_hat| (CAE);
+    kind='map':      `predict` returns per-tile anomaly maps that are fused as is (DRAEM-CAE)."""
     t, ys, xs = tiles(frame, cfg.tile, cfg.stride)
     xh = predict(t)
-    A = gaussian_filter(fuse(np.abs(t - xh), frame.shape, ys, xs, cfg.tile), cfg.sigma)
+    per_tile = np.abs(t - xh) if kind == "residual" else xh
+    A = gaussian_filter(fuse(per_tile, frame.shape, ys, xs, cfg.tile), cfg.sigma)
     if cfg.edge:
         A[:, :cfg.edge] = 0
         A[:, -cfg.edge:] = 0
@@ -149,3 +153,22 @@ def onnx_predictor(path, threads=None):
 
     predict.session = sess
     return predict
+
+
+METHODS = {"cae": ("afp_cae", ""), "draem": ("draem_cae", "_draem")}   # method -> (file stem, threshold suffix)
+
+
+def backend(method, weights=None, onnx=None, threads=None, models_dir="models"):
+    """('cae' | 'draem') -> (predict, kind) for `anomaly_map`; JAX weights (.npz) unless `onnx` is given.
+    Default files: models/afp_cae.{npz,onnx} or models/draem_cae.{npz,onnx}."""
+    from pathlib import Path
+    stem = METHODS[method][0]
+    kind = "map" if method == "draem" else "residual"
+    if onnx:
+        return onnx_predictor(Path(models_dir) / f"{stem}.onnx" if onnx is True else onnx, threads), kind
+    weights = weights or Path(models_dir) / f"{stem}.npz"
+    if method == "draem":
+        from . import draem
+        return draem.jax_predictor(draem.load_params(weights)), kind
+    from .model import load_params
+    return jax_predictor(load_params(weights)), kind

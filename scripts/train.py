@@ -41,6 +41,38 @@ def build_dataset(rng, n_frames, crops, scans=None):
     return X
 
 
+def fit(X, rng, epochs=25, batch=64, lr=1e-3, seed=0, out=None, verbose=True):
+    """Adam with cosine LR decay to 5 % over tiles X[N, 64, 64, 1]. Returns (params, loss per epoch).
+    `out`: checkpoint written after every epoch."""
+    params = init_params(jax.random.PRNGKey(seed))
+    if verbose:
+        print("parameters:", count_params(params), flush=True)
+    steps = epochs * (len(X) // batch)
+    opt = optax.adam(optax.cosine_decay_schedule(lr, steps, alpha=0.05))
+    state = opt.init(params)
+
+    @jax.jit
+    def step(p, s, xb):
+        loss, g = jax.value_and_grad(loss_fn)(p, xb)
+        upd, s = opt.update(g, s, p)
+        return optax.apply_updates(p, upd), s, loss
+
+    history = []
+    for ep in range(epochs):
+        perm = rng.permutation(len(X))
+        losses, te = [], time.time()
+        for b in range(len(X) // batch):
+            params, state, loss = step(params, state, jnp.asarray(X[perm[b * batch:(b + 1) * batch]]))
+            losses.append(float(loss))
+        history.append(float(np.mean(losses)))
+        if verbose:
+            print(f"epoch {ep + 1:3d}/{epochs}  loss {history[-1]:.5f}  ({time.time() - te:.1f} s)", flush=True)
+        if out:
+            Path(out).parent.mkdir(parents=True, exist_ok=True)
+            save_params(params, out)   # checkpoint every epoch
+    return params, history
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--frames", type=int, default=400, help="defect-free frames to generate")
@@ -61,29 +93,7 @@ def main():
     X = build_dataset(rng, a.frames, a.crops, scans)
     print(f"dataset {X.shape} built in {time.time() - t0:.1f} s", flush=True)
 
-    params = init_params(jax.random.PRNGKey(a.seed))
-    print("parameters:", count_params(params), flush=True)
-    steps = a.epochs * (len(X) // a.batch)
-    opt = optax.adam(optax.cosine_decay_schedule(a.lr, steps, alpha=0.05))
-    state = opt.init(params)
-
-    @jax.jit
-    def step(p, s, xb):
-        loss, g = jax.value_and_grad(loss_fn)(p, xb)
-        upd, s = opt.update(g, s, p)
-        return optax.apply_updates(p, upd), s, loss
-
-    history = []
-    for ep in range(a.epochs):
-        perm = rng.permutation(len(X))
-        losses, te = [], time.time()
-        for b in range(len(X) // a.batch):
-            params, state, loss = step(params, state, jnp.asarray(X[perm[b * a.batch:(b + 1) * a.batch]]))
-            losses.append(float(loss))
-        history.append(float(np.mean(losses)))
-        print(f"epoch {ep + 1:3d}/{a.epochs}  loss {history[-1]:.5f}  ({time.time() - te:.1f} s)", flush=True)
-        Path(a.out).parent.mkdir(parents=True, exist_ok=True)
-        save_params(params, a.out)   # checkpoint every epoch
+    params, history = fit(X, rng, a.epochs, a.batch, a.lr, a.seed, out=a.out)
 
     Path(a.log).parent.mkdir(parents=True, exist_ok=True)
     json.dump({"loss": history, "params": count_params(params), "train_tiles": int(len(X)),

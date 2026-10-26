@@ -1,0 +1,761 @@
+{
+ "protocol": {
+  "folds": [
+   1,
+   2,
+   3
+  ],
+  "seeds": [
+   0,
+   1,
+   2
+  ],
+  "trials": 10,
+  "thr_pct": 99.5,
+  "seam_frac": 0.5,
+  "variants": [
+   "none",
+   "sobel_x",
+   "canny",
+   "canny_hough"
+  ],
+  "thresholds": [
+   "fixed",
+   "recal"
+  ]
+ },
+ "results": {
+  "fixed": {
+   "random": {
+    "cae": {
+     "none": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.5705705705705706,
+      "detected_ci95": [
+       0.5471471471471472,
+       0.5951951951951951
+      ],
+      "detected_on_seams": 0.6422764227642277,
+      "detected_off_seams": 0.5581395348837209,
+      "detected_by_type": {
+       "gap": 0.6388888888888888,
+       "overlap": 0.8027777777777778,
+       "fod": 0.55,
+       "twist": 0.42244224422442245,
+       "wrinkle": 0.3723404255319149
+      },
+      "false_zones_per_m": 36.213014214703655,
+      "false_zones_per_m_on_seams": 27.88803400313797,
+      "tile_auroc": 0.78246033335876,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.5243243243243243,
+      "detected_ci95": [
+       0.5009009009009009,
+       0.5483483483483483
+      ],
+      "detected_on_seams": 0.4146341463414634,
+      "detected_off_seams": 0.5433403805496829,
+      "detected_by_type": {
+       "gap": 0.5611111111111111,
+       "overlap": 0.7388888888888889,
+       "fod": 0.525,
+       "twist": 0.3927392739273927,
+       "wrinkle": 0.34397163120567376
+      },
+      "false_zones_per_m": 35.72148890205689,
+      "false_zones_per_m_on_seams": 4.275052152399469,
+      "tile_auroc": 0.830678772851087,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.5363363363363364,
+      "detected_ci95": [
+       0.512912912912913,
+       0.5609609609609609
+      ],
+      "detected_on_seams": 0.4715447154471545,
+      "detected_off_seams": 0.547568710359408,
+      "detected_by_type": {
+       "gap": 0.5805555555555556,
+       "overlap": 0.7638888888888888,
+       "fod": 0.5277777777777778,
+       "twist": 0.39603960396039606,
+       "wrinkle": 0.35106382978723405
+      },
+      "false_zones_per_m": 36.660584073965644,
+      "false_zones_per_m_on_seams": 23.35205184961075,
+      "tile_auroc": 0.8150421827684915,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.5411411411411411,
+      "detected_ci95": [
+       0.5177177177177177,
+       0.5657657657657658
+      ],
+      "detected_on_seams": 0.4878048780487805,
+      "detected_off_seams": 0.5503875968992248,
+      "detected_by_type": {
+       "gap": 0.5861111111111111,
+       "overlap": 0.7666666666666667,
+       "fod": 0.5333333333333333,
+       "twist": 0.39603960396039606,
+       "wrinkle": 0.3617021276595745
+      },
+      "false_zones_per_m": 34.66184695612927,
+      "false_zones_per_m_on_seams": 23.54803034692174,
+      "tile_auroc": 0.8013994673201966,
+      "excluded_share": 0.1213873835726398
+     }
+    },
+    "draem": {
+     "none": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6396396396396397,
+      "detected_ci95": [
+       0.6168168168168168,
+       0.6630630630630631
+      ],
+      "detected_on_seams": 0.6544715447154471,
+      "detected_off_seams": 0.6370683579985905,
+      "detected_by_type": {
+       "gap": 0.7555555555555555,
+       "overlap": 0.8,
+       "fod": 0.7083333333333334,
+       "twist": 0.46864686468646866,
+       "wrinkle": 0.3829787234042553
+      },
+      "false_zones_per_m": 27.340844329065092,
+      "false_zones_per_m_on_seams": 10.090447924699445,
+      "tile_auroc": 0.8311523568601196,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6162162162162163,
+      "detected_ci95": [
+       0.5933933933933934,
+       0.6384534534534533
+      ],
+      "detected_on_seams": 0.540650406504065,
+      "detected_off_seams": 0.6293164200140944,
+      "detected_by_type": {
+       "gap": 0.7138888888888889,
+       "overlap": 0.7722222222222223,
+       "fod": 0.6944444444444444,
+       "twist": 0.46204620462046203,
+       "wrinkle": 0.35815602836879434
+      },
+      "false_zones_per_m": 21.55468892273346,
+      "false_zones_per_m_on_seams": 0.39252648358173037,
+      "tile_auroc": 0.8463158264209527,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.624024024024024,
+      "detected_ci95": [
+       0.6012012012012012,
+       0.6474474474474474
+      ],
+      "detected_on_seams": 0.573170731707317,
+      "detected_off_seams": 0.6328400281888654,
+      "detected_by_type": {
+       "gap": 0.7194444444444444,
+       "overlap": 0.7861111111111111,
+       "fod": 0.6972222222222222,
+       "twist": 0.46534653465346537,
+       "wrinkle": 0.3723404255319149
+      },
+      "false_zones_per_m": 22.617856703997763,
+      "false_zones_per_m_on_seams": 4.634746191547222,
+      "tile_auroc": 0.8437679195912366,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.624024024024024,
+      "detected_ci95": [
+       0.6012012012012012,
+       0.6474474474474474
+      ],
+      "detected_on_seams": 0.573170731707317,
+      "detected_off_seams": 0.6328400281888654,
+      "detected_by_type": {
+       "gap": 0.7194444444444444,
+       "overlap": 0.7861111111111111,
+       "fod": 0.6972222222222222,
+       "twist": 0.46534653465346537,
+       "wrinkle": 0.3723404255319149
+      },
+      "false_zones_per_m": 23.622065408447487,
+      "false_zones_per_m_on_seams": 6.248222106399448,
+      "tile_auroc": 0.8426233835399081,
+      "excluded_share": 0.1213873835726398
+     }
+    }
+   },
+   "seams": {
+    "cae": {
+     "none": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.5777374470659408,
+      "detected_ci95": [
+       0.5547338173018753,
+       0.6013460375075619
+      ],
+      "detected_on_seams": 0.7956989247311828,
+      "detected_off_seams": 0.49242424242424243,
+      "detected_by_type": {
+       "gap": 0.7305555555555555,
+       "overlap": 0.7916666666666666,
+       "fod": 0.48333333333333334,
+       "twist": 0.411214953271028,
+       "wrinkle": 0.4007936507936508
+      },
+      "false_zones_per_m": 36.43197456563776,
+      "false_zones_per_m_on_seams": 27.388495035901926,
+      "tile_auroc": 0.8000421657560437,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.49304295220810646,
+      "detected_ci95": [
+       0.4688445251058681,
+       0.5178463399879008
+      ],
+      "detected_on_seams": 0.524731182795699,
+      "detected_off_seams": 0.48063973063973064,
+      "detected_by_type": {
+       "gap": 0.48333333333333334,
+       "overlap": 0.6805555555555556,
+       "fod": 0.48055555555555557,
+       "twist": 0.3862928348909657,
+       "wrinkle": 0.39285714285714285
+      },
+      "false_zones_per_m": 35.429683304065364,
+      "false_zones_per_m_on_seams": 3.0977976427049487,
+      "tile_auroc": 0.8335114817776618,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.5311554748941318,
+      "detected_ci95": [
+       0.5063520871143375,
+       0.5559588626739262
+      ],
+      "detected_on_seams": 0.6430107526881721,
+      "detected_off_seams": 0.48737373737373735,
+      "detected_by_type": {
+       "gap": 0.6027777777777777,
+       "overlap": 0.725,
+       "fod": 0.48333333333333334,
+       "twist": 0.3956386292834891,
+       "wrinkle": 0.39285714285714285
+      },
+      "false_zones_per_m": 35.87644471761896,
+      "false_zones_per_m_on_seams": 20.990169406529937,
+      "tile_auroc": 0.8242357892055593,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.543254688445251,
+      "detected_ci95": [
+       0.5184513006654567,
+       0.5680580762250453
+      ],
+      "detected_on_seams": 0.6838709677419355,
+      "detected_off_seams": 0.4882154882154882,
+      "detected_by_type": {
+       "gap": 0.6416666666666667,
+       "overlap": 0.7388888888888889,
+       "fod": 0.48333333333333334,
+       "twist": 0.3987538940809969,
+       "wrinkle": 0.39285714285714285
+      },
+      "false_zones_per_m": 34.12523473095895,
+      "false_zones_per_m_on_seams": 21.360198722511957,
+      "tile_auroc": 0.8149825622773145,
+      "excluded_share": 0.1213873835726398
+     }
+    },
+    "draem": {
+     "none": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6739261947973382,
+      "detected_ci95": [
+       0.6515426497277677,
+       0.6963248638838475
+      ],
+      "detected_on_seams": 0.8172043010752689,
+      "detected_off_seams": 0.6178451178451179,
+      "detected_by_type": {
+       "gap": 0.8027777777777778,
+       "overlap": 0.8333333333333334,
+       "fod": 0.7027777777777777,
+       "twist": 0.5202492211838006,
+       "wrinkle": 0.4166666666666667
+      },
+      "false_zones_per_m": 27.15030137793932,
+      "false_zones_per_m_on_seams": 8.964288955664928,
+      "tile_auroc": 0.8459561714582017,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6067755595886267,
+      "detected_ci95": [
+       0.5831820931639443,
+       0.631578947368421
+      ],
+      "detected_on_seams": 0.5956989247311828,
+      "detected_off_seams": 0.6111111111111112,
+      "detected_by_type": {
+       "gap": 0.625,
+       "overlap": 0.7361111111111112,
+       "fod": 0.6944444444444444,
+       "twist": 0.5015576323987538,
+       "wrinkle": 0.40476190476190477
+      },
+      "false_zones_per_m": 22.775511112535717,
+      "false_zones_per_m_on_seams": 0.48352798701100597,
+      "tile_auroc": 0.8409119868292105,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6442831215970962,
+      "detected_ci95": [
+       0.6212946158499697,
+       0.6672716273442226
+      ],
+      "detected_on_seams": 0.7247311827956989,
+      "detected_off_seams": 0.6127946127946128,
+      "detected_by_type": {
+       "gap": 0.7305555555555555,
+       "overlap": 0.7861111111111111,
+       "fod": 0.7027777777777777,
+       "twist": 0.5077881619937694,
+       "wrinkle": 0.4087301587301587
+      },
+      "false_zones_per_m": 24.34653234226848,
+      "false_zones_per_m_on_seams": 5.0861834313270595,
+      "tile_auroc": 0.8452444388352945,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6491228070175439,
+      "detected_ci95": [
+       0.6261343012704175,
+       0.6715214761040531
+      ],
+      "detected_on_seams": 0.7397849462365591,
+      "detected_off_seams": 0.6136363636363636,
+      "detected_by_type": {
+       "gap": 0.7472222222222222,
+       "overlap": 0.7888888888888889,
+       "fod": 0.7027777777777777,
+       "twist": 0.5109034267912772,
+       "wrinkle": 0.4087301587301587
+      },
+      "false_zones_per_m": 25.08741151655895,
+      "false_zones_per_m_on_seams": 6.405866455499913,
+      "tile_auroc": 0.8445773074039592,
+      "excluded_share": 0.1213873835726398
+     }
+    }
+   }
+  },
+  "recal": {
+   "random": {
+    "cae": {
+     "none": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.5705705705705706,
+      "detected_ci95": [
+       0.5471471471471472,
+       0.5951951951951951
+      ],
+      "detected_on_seams": 0.6422764227642277,
+      "detected_off_seams": 0.5581395348837209,
+      "detected_by_type": {
+       "gap": 0.6388888888888888,
+       "overlap": 0.8027777777777778,
+       "fod": 0.55,
+       "twist": 0.42244224422442245,
+       "wrinkle": 0.3723404255319149
+      },
+      "false_zones_per_m": 36.213014214703655,
+      "false_zones_per_m_on_seams": 27.88803400313797,
+      "tile_auroc": 0.78246033335876,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6414414414414414,
+      "detected_ci95": [
+       0.6186036036036037,
+       0.6648648648648648
+      ],
+      "detected_on_seams": 0.4878048780487805,
+      "detected_off_seams": 0.6680761099365751,
+      "detected_by_type": {
+       "gap": 0.7055555555555556,
+       "overlap": 0.8194444444444444,
+       "fod": 0.6138888888888889,
+       "twist": 0.5148514851485149,
+       "wrinkle": 0.5035460992907801
+      },
+      "false_zones_per_m": 83.62223219183502,
+      "false_zones_per_m_on_seams": 4.611765707098779,
+      "tile_auroc": 0.830678772851087,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6312312312312313,
+      "detected_ci95": [
+       0.6084084084084084,
+       0.654054054054054
+      ],
+      "detected_on_seams": 0.556910569105691,
+      "detected_off_seams": 0.6441155743481325,
+      "detected_by_type": {
+       "gap": 0.6972222222222222,
+       "overlap": 0.8333333333333334,
+       "fod": 0.5888888888888889,
+       "twist": 0.504950495049505,
+       "wrinkle": 0.4787234042553192
+      },
+      "false_zones_per_m": 93.1073179786715,
+      "false_zones_per_m_on_seams": 46.29148518654478,
+      "tile_auroc": 0.8150421827684915,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.621021021021021,
+      "detected_ci95": [
+       0.5981981981981982,
+       0.6438588588588587
+      ],
+      "detected_on_seams": 0.556910569105691,
+      "detected_off_seams": 0.6321353065539113,
+      "detected_by_type": {
+       "gap": 0.6861111111111111,
+       "overlap": 0.8361111111111111,
+       "fod": 0.5805555555555556,
+       "twist": 0.4884488448844885,
+       "wrinkle": 0.4574468085106383
+      },
+      "false_zones_per_m": 65.69108361278961,
+      "false_zones_per_m_on_seams": 36.64326777154307,
+      "tile_auroc": 0.8013994673201966,
+      "excluded_share": 0.1213873835726398
+     }
+    },
+    "draem": {
+     "none": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6396396396396397,
+      "detected_ci95": [
+       0.6168168168168168,
+       0.6630630630630631
+      ],
+      "detected_on_seams": 0.6544715447154471,
+      "detected_off_seams": 0.6370683579985905,
+      "detected_by_type": {
+       "gap": 0.7555555555555555,
+       "overlap": 0.8,
+       "fod": 0.7083333333333334,
+       "twist": 0.46864686468646866,
+       "wrinkle": 0.3829787234042553
+      },
+      "false_zones_per_m": 27.340844329065092,
+      "false_zones_per_m_on_seams": 10.090447924699445,
+      "tile_auroc": 0.8311523568601196,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6378378378378379,
+      "detected_ci95": [
+       0.6156156156156156,
+       0.6612612612612613
+      ],
+      "detected_on_seams": 0.5365853658536586,
+      "detected_off_seams": 0.6553911205073996,
+      "detected_by_type": {
+       "gap": 0.7388888888888889,
+       "overlap": 0.8027777777777778,
+       "fod": 0.7,
+       "twist": 0.48514851485148514,
+       "wrinkle": 0.3829787234042553
+      },
+      "false_zones_per_m": 28.92820218879334,
+      "false_zones_per_m_on_seams": 1.0858007910537164,
+      "tile_auroc": 0.8463158264209527,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6396396396396397,
+      "detected_ci95": [
+       0.6168168168168168,
+       0.6624624624624624
+      ],
+      "detected_on_seams": 0.5691056910569106,
+      "detected_off_seams": 0.6518675123326286,
+      "detected_by_type": {
+       "gap": 0.7361111111111112,
+       "overlap": 0.8166666666666667,
+       "fod": 0.7055555555555556,
+       "twist": 0.47854785478547857,
+       "wrinkle": 0.37943262411347517
+      },
+      "false_zones_per_m": 27.008419624184317,
+      "false_zones_per_m_on_seams": 5.616475273255339,
+      "tile_auroc": 0.8437679195912366,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1665,
+      "defects_on_seams": 246,
+      "detected": 0.6336336336336337,
+      "detected_ci95": [
+       0.6108108108108108,
+       0.6564564564564564
+      ],
+      "detected_on_seams": 0.5650406504065041,
+      "detected_off_seams": 0.6455250176180408,
+      "detected_by_type": {
+       "gap": 0.7277777777777777,
+       "overlap": 0.8055555555555556,
+       "fod": 0.7027777777777777,
+       "twist": 0.47194719471947194,
+       "wrinkle": 0.37943262411347517
+      },
+      "false_zones_per_m": 25.998824368253256,
+      "false_zones_per_m_on_seams": 7.599996416745016,
+      "tile_auroc": 0.8426233835399081,
+      "excluded_share": 0.1213873835726398
+     }
+    }
+   },
+   "seams": {
+    "cae": {
+     "none": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.5777374470659408,
+      "detected_ci95": [
+       0.5547338173018753,
+       0.6013460375075619
+      ],
+      "detected_on_seams": 0.7956989247311828,
+      "detected_off_seams": 0.49242424242424243,
+      "detected_by_type": {
+       "gap": 0.7305555555555555,
+       "overlap": 0.7916666666666666,
+       "fod": 0.48333333333333334,
+       "twist": 0.411214953271028,
+       "wrinkle": 0.4007936507936508
+      },
+      "false_zones_per_m": 36.43197456563776,
+      "false_zones_per_m_on_seams": 27.388495035901926,
+      "tile_auroc": 0.8000421657560437,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6188747731397459,
+      "detected_ci95": [
+       0.5952813067150635,
+       0.643088324258923
+      ],
+      "detected_on_seams": 0.6043010752688172,
+      "detected_off_seams": 0.6245791245791246,
+      "detected_by_type": {
+       "gap": 0.6,
+       "overlap": 0.7527777777777778,
+       "fod": 0.5944444444444444,
+       "twist": 0.5794392523364486,
+       "wrinkle": 0.5396825396825397
+      },
+      "false_zones_per_m": 85.21222407983029,
+      "false_zones_per_m_on_seams": 4.260582441636545,
+      "tile_auroc": 0.8335114817776618,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.632183908045977,
+      "detected_ci95": [
+       0.6091954022988506,
+       0.6557773744706594
+      ],
+      "detected_on_seams": 0.7053763440860215,
+      "detected_off_seams": 0.6035353535353535,
+      "detected_by_type": {
+       "gap": 0.6777777777777778,
+       "overlap": 0.7833333333333333,
+       "fod": 0.5833333333333334,
+       "twist": 0.5638629283489096,
+       "wrinkle": 0.5079365079365079
+      },
+      "false_zones_per_m": 93.61896548002709,
+      "false_zones_per_m_on_seams": 46.08210603909207,
+      "tile_auroc": 0.8242357892055593,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6285541439806412,
+      "detected_ci95": [
+       0.6055656382335148,
+       0.6527525710828797
+      ],
+      "detected_on_seams": 0.7462365591397849,
+      "detected_off_seams": 0.5824915824915825,
+      "detected_by_type": {
+       "gap": 0.7138888888888889,
+       "overlap": 0.8,
+       "fod": 0.55,
+       "twist": 0.5358255451713395,
+       "wrinkle": 0.49206349206349204
+      },
+      "false_zones_per_m": 63.337275789456264,
+      "false_zones_per_m_on_seams": 34.83763541925281,
+      "tile_auroc": 0.8149825622773145,
+      "excluded_share": 0.1213873835726398
+     }
+    },
+    "draem": {
+     "none": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6739261947973382,
+      "detected_ci95": [
+       0.6515426497277677,
+       0.6963248638838475
+      ],
+      "detected_on_seams": 0.8172043010752689,
+      "detected_off_seams": 0.6178451178451179,
+      "detected_by_type": {
+       "gap": 0.8027777777777778,
+       "overlap": 0.8333333333333334,
+       "fod": 0.7027777777777777,
+       "twist": 0.5202492211838006,
+       "wrinkle": 0.4166666666666667
+      },
+      "false_zones_per_m": 27.15030137793932,
+      "false_zones_per_m_on_seams": 8.964288955664928,
+      "tile_auroc": 0.8459561714582017,
+      "excluded_share": 0.0
+     },
+     "sobel_x": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6273442226255294,
+      "detected_ci95": [
+       0.603145795523291,
+       0.6515426497277677
+      ],
+      "detected_on_seams": 0.6172043010752688,
+      "detected_off_seams": 0.6313131313131313,
+      "detected_by_type": {
+       "gap": 0.6583333333333333,
+       "overlap": 0.7472222222222222,
+       "fod": 0.7194444444444444,
+       "twist": 0.5109034267912772,
+       "wrinkle": 0.42857142857142855
+      },
+      "false_zones_per_m": 30.848218285372454,
+      "false_zones_per_m_on_seams": 0.7534238722500372,
+      "tile_auroc": 0.8409119868292105,
+      "excluded_share": 0.1714087216329226
+     },
+     "canny": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6533575317604355,
+      "detected_ci95": [
+       0.6297640653357531,
+       0.6763460375075621
+      ],
+      "detected_on_seams": 0.7290322580645161,
+      "detected_off_seams": 0.6237373737373737,
+      "detected_by_type": {
+       "gap": 0.7444444444444445,
+       "overlap": 0.7944444444444444,
+       "fod": 0.7111111111111111,
+       "twist": 0.5077881619937694,
+       "wrinkle": 0.4246031746031746
+      },
+      "false_zones_per_m": 28.797263678390763,
+      "false_zones_per_m_on_seams": 5.943450035613341,
+      "tile_auroc": 0.8452444388352945,
+      "excluded_share": 0.13167605788932404
+     },
+     "canny_hough": {
+      "defects": 1653,
+      "defects_on_seams": 465,
+      "detected": 0.6557773744706594,
+      "detected_ci95": [
+       0.632183908045977,
+       0.6787658802177858
+      ],
+      "detected_on_seams": 0.7397849462365591,
+      "detected_off_seams": 0.622895622895623,
+      "detected_by_type": {
+       "gap": 0.7611111111111111,
+       "overlap": 0.7972222222222223,
+       "fod": 0.7083333333333334,
+       "twist": 0.5077881619937694,
+       "wrinkle": 0.4166666666666667
+      },
+      "false_zones_per_m": 27.756035541639413,
+      "false_zones_per_m_on_seams": 7.601149871973321,
+      "tile_auroc": 0.8445773074039592,
+      "excluded_share": 0.1213873835726398
+     }
+    }
+   }
+  }
+ }
+}

@@ -162,6 +162,141 @@ code lowers the training loss but starts to reconstruct defects, so d = 32 gives
 | **Full frame pipeline** | 135.4 | 61.0 |
 | Frames/s → max layup speed | 7.4 → 11.3 m/min | 16.4 → 25.2 m/min |
 
+## DRAEM-CAE (branch `draem`, pilot study)
+
+DRAEM (Zavrtanik et al., ICCV 2021) built on the CAE above (`afp_cae/draem.py`). The CAE keeps its architecture
+and loss (1) but learns to *restore* a defect-free tile $x$ from a corrupted copy $x_a$; a small U-Net
+$h_\psi$ segments the corruption from the pair $(x_a, \hat{x})$:
+
+$$
+\mathcal{L} = \alpha\big(1-\mathrm{SSIM}(x,\hat{x})\big) + (1-\alpha)\,\lVert x-\hat{x}\rVert_1
++ \mathcal{L}_{\mathrm{focal}}\big(\sigma(h_\psi(x_a, \hat{x})), M\big),\qquad \hat{x} = g_\varphi(f_\theta(x_a)).
+$$
+
+The corruption $(x_a, M)$ is drawn on the device during training: a thresholded Perlin-noise region inside which the
+height becomes a blend of the tile and a height step, a smooth relief or another tile. The defect generator of
+`afp_cae/synth.py` is **never** used for training. At inference the anomaly map is $\sigma(h_\psi)$ instead of
+$|x-\hat{x}|$; fusion of tiles, smoothing, edge band and the decision rule (2) are unchanged
+(`anomaly_map(..., kind="map")`).
+
+| | CAE | DRAEM-CAE |
+|---|---|---|
+| Parameters | 189 297 | 247 362 (CAE + 58 065 U-Net) |
+| MMAC per tile | 25 | 92 |
+| Training, 16 000 tiles (RTX 4080 SUPER, JAX in WSL2) | 25 epochs, ~20 s | 100 epochs, ~2.5 min |
+
+**Synthetic data** (protocol of `scripts/evaluate.py`; mean ± s.d. over 5 training seeds, `scripts/seeds.py`):
+
+| Metric | CAE | DRAEM-CAE |
+|---|---|---|
+| Tile-level AUROC / AP | 0.989 / 0.894 | 1.000 / 0.995 |
+| Defect instances detected | 87.2 ± 2.9 % (83–90) | 99.9 ± 0.1 % |
+| Mean IoU | 0.53 ± 0.01 | 0.81 ± 0.03 |
+| False alarms per metre | 0.30 ± 0.24 | 0.55 ± 0.57 (0–1.37) |
+| Defect-free test frames with an alarm, per seed | 0, 0, 0, 1, 4 | 0, 8, 1, 0, 0 |
+
+| Defect type, detected % | gap | overlap | twist | foreign object | fuzzball | wrinkle | missing tow |
+|---|---|---|---|---|---|---|---|
+| CAE | 100 | 100 | 96 | 78 | 58 | 79 | 100 |
+| DRAEM-CAE | 100 | 100 | 100 | 99 | 100 | 100 | 100 |
+
+The synthetic benchmark is saturated by DRAEM-CAE; differences between its variants are evaluated on real scans.
+
+**Real scans** of Cardoso et al. (2026), Zenodo [10.5281/zenodo.17048470](https://doi.org/10.5281/zenodo.17048470),
+CC BY 4.0: 2 layers × 3 passes of a KUKA AFP cell, resampled to 0.1 mm/px (`afp_cae/cardoso.py`), synthetic defects
+of 5 types injected in millimetres into the clean scans (`cardoso.inject`). Protocol of `scripts/eval_cardoso.py`:
+cross-validation over passes (train on 4, test on 2), threshold = 99.5th percentile of scores of models that did not
+see the scored pass, 10 injections × 2 test passes × 3 folds; 2 775 defects per method for 5 seeds
+(`results/cardoso_5seeds/`); 95 % bootstrap intervals. False zones: components of $\{A>\tau\}$ that do not touch a
+defect (no minimal area), per metre of scan. These numbers are not comparable with the synthetic false alarms above
+(different threshold rule and data).
+
+| Metric (5 seeds) | CAE | DRAEM-CAE |
+|---|---|---|
+| Tile-level AUROC | 0.78 | 0.84 |
+| Defects detected | 57.7 % (55.9–59.5) | 64.9 % (63.1–66.7) |
+| Defects detected, per seed | 56.8, 60.2, 56.9, 57.5, 57.3 | 64.9, 68.6, 62.2, 66.3, 62.5 |
+| False zones per metre | 32.4 | 28.4 |
+| False zones per metre, per seed | 33.1, 36.3, 32.5, 32.6, 27.3 | 29.0, 42.8, 20.8, 28.3, 21.0 |
+| False zones on tow seams per metre (seams cover 17.5 % of the area) | 24.4 (76 %) | 9.7 (34 %) |
+
+| Defect type, detected % | gap | overlap | foreign object | twist | wrinkle |
+|---|---|---|---|---|---|
+| CAE | 67 | 81 | 55 | 43 | 36 |
+| DRAEM-CAE | 76 | 81 | 71 | 49 | 40 |
+
+DRAEM-CAE detects 7 percentage points more defects (foreign objects and gaps most of all) with fewer false zones on
+average. Three quarters of the false zones of the CAE lie on tow seams, where their density is ~15 times that on the
+rest of the tape; DRAEM-CAE has 2.5 times fewer of them there, its remaining false zones lie mostly on scanner artefacts
+of layer 2. Its false-zone count depends on the training run (one seed of five gives 42.8 per metre): GPU training is
+not deterministic, and the same seed retrained gives a different count.
+
+**Ensemble** (`eval_cardoso.py --ensemble 3`, `results/cardoso_ens3/`): the anomaly map is the mean of 3 DRAEM-CAE
+models trained with different seeds; every model of the protocol (auxiliary and final) is such an ensemble.
+Two ensembles (seeds 0, 1000, 2000 and 1, 1001, 2001):
+
+| Metric | DRAEM-CAE, single model (5 seeds) | DRAEM-CAE, ensemble of 3 (2 ensembles) |
+|---|---|---|
+| Tile-level AUROC | 0.84 | 0.85 |
+| Defects detected | 64.9 % (63.1–66.7) | 67.3 % (64.6–70.0) |
+| False zones per metre, per run | 29.0, 42.8, 20.8, 28.3, 21.0 | 27.9, 32.4 |
+| False zones on tow seams per metre | 9.7 | 9.2 |
+
+The ensemble removes the outlier runs at the same detection rate, at 3 times the inference cost
+(~2.7 m/min on the Ryzen of the inference table below).
+
+**Exclusion of tape boundaries** (`scripts/eval_boundaries.py`, `results/cardoso_boundaries/`, masks in
+`masks.png`): tow seams and tape edges are found on the clean scan (0.1 mm/px grid, edge slope 0.3 mm/mm, ±0.5 mm
+band) and the anomaly map is set to 0 there, as the 1.2 mm course-edge band. Detectors: Sobel along x on the map
+smoothed along the layup; Canny edges running along the layup; straight probabilistic-Hough segments (±15° of the
+layup, ≥ 10 mm) on the Canny edges. The threshold is that of the variant without exclusion, so exclusion only removes
+what lies in the zone (a threshold recalibrated on the kept pixels just moves the false zones onto the tape, see
+`summary.json`). Defect set with half of the gaps and overlaps centred on tow seams (465 of 1 665 defects on seams),
+3 seeds:
+
+| Method | Boundary detector | Area excluded | Detected | on seams | off seams | False zones / m | on seams |
+|---|---|---|---|---|---|---|---|
+| CAE | none | 0 % | 57.8 % | 79.6 % | 49.2 % | 36.4 | 27.4 |
+| CAE | Sobel x | 17.1 % | 49.3 % | 52.5 % | 48.1 % | 35.4 | 3.1 |
+| CAE | Canny | 13.2 % | 53.1 % | 64.3 % | 48.7 % | 35.9 | 21.0 |
+| CAE | Canny + Hough | 12.1 % | 54.3 % | 68.4 % | 48.8 % | 34.1 | 21.4 |
+| DRAEM-CAE | none | 0 % | 67.4 % | 81.7 % | 61.8 % | 27.2 | 9.0 |
+| DRAEM-CAE | Sobel x | 17.1 % | 60.7 % | 59.6 % | 61.1 % | 22.8 | 0.5 |
+| DRAEM-CAE | Canny | 13.2 % | 64.4 % | 72.5 % | 61.3 % | 24.3 | 5.1 |
+| DRAEM-CAE | Canny + Hough | 12.1 % | 64.9 % | 74.0 % | 61.4 % | 25.1 | 6.4 |
+
+Excluding the boundaries removes the false zones on seams but also the real gaps and overlaps that occur there
+(on-seam detection drops by 8–27 percentage points), while the total number of false zones falls little: for the
+CAE it hardly changes, probably because zones crossing a seam split into pieces on both sides of the excluded band.
+Narrower zones (Canny, Canny + Hough) lose fewer seam defects and remove fewer false zones. The tile-level AUROC rises
+after exclusion (CAE 0.80 → 0.83) only because the seams, where the clean-tape scores are highest, are no longer
+scored. With randomly placed defects the picture is the same (`summary.json`, set `random`). Suppressing seam false
+zones by the model (DRAEM-CAE, its ensemble) keeps the seam defects and is preferable to masking.
+
+**Inference** (ONNX Runtime, FP32, 2 threads, AMD Ryzen 9 7900X; both models measured on the same machine):
+
+| | CAE | DRAEM-CAE |
+|---|---|---|
+| Tiles/s | 3 068 | 908 |
+| Full frame pipeline, frames/s | 14.6 | 5.2 |
+| Max layup speed | 22.4 m/min | 8.0 m/min |
+
+On the 2-vCPU Xeon of the table above this scales to roughly 4.5 m/min for DRAEM-CAE.
+
+```bash
+python scripts/train_draem.py                      # DRAEM-CAE on the synthetic training set -> models/draem_cae.npz
+python scripts/evaluate.py --method draem          # synthetic protocol -> results/results_draem.json
+python scripts/export_onnx.py --method draem       # models/draem_cae.onnx, results/ort_bench_draem.json
+python scripts/detect.py --demo --method draem     # also calibrate.py --method draem
+python scripts/seeds.py --method draem             # 5 seeds -> results/seeds_draem.json
+python scripts/eval_cardoso.py --data path/to/cardoso/data            # CAE and DRAEM-CAE on real scans
+python scripts/eval_cardoso.py --data path/to/cardoso/data --methods draem --ensemble 3
+python scripts/eval_boundaries.py --data path/to/cardoso/data         # exclusion of tape boundaries
+```
+
+JAX has no CUDA build for native Windows; on Windows train on the GPU inside WSL2 with `pip install "jax[cuda12]"`
+and `XLA_PYTHON_CLIENT_PREALLOCATE=false`.
+
 ## Quick start
 
 ```bash
@@ -202,9 +337,15 @@ afp_cae/
   synth.py         synthetic 12-tow AFP height maps with seven defect types
   model.py         CAE in JAX: initialisation, encoder/decoder, SSIM, loss (1), save/load (.npz)
   pipeline.py      pre-processing, tiling, anomaly map, decision rule (2), JAX and ONNX backends
-  onnx_export.py   JAX parameters -> ONNX graph (opset 17)
+  onnx_export.py   JAX parameters -> ONNX graph (opset 17); DRAEM-CAE graph (build_draem_onnx)
+  draem.py         DRAEM-CAE: Perlin corruption, U-Net discriminator, loss, save/load
+  cardoso.py       Cardoso et al. scans: loading, 0.1 mm/px grid, tow seams, tape-boundary detectors, defects in mm
 scripts/
   train.py         training (synthetic or --data)
+  train_draem.py   DRAEM-CAE training (synthetic or --data; --init from a trained CAE)
+  seeds.py         train + evaluate with several seeds -> results/seeds_<method>.json
+  eval_cardoso.py  CAE / DRAEM-CAE on the Cardoso scans (--seeds, --ensemble) -> results/cardoso*/
+  eval_boundaries.py  exclusion of tape boundaries on the Cardoso scans -> results/cardoso_boundaries/
   calibrate.py     threshold calibration on defect-free scans
   evaluate.py      full evaluation protocol + JAX benchmark -> results/results.json, models/threshold.json
   export_onnx.py   ONNX export + ONNX Runtime benchmark -> models/afp_cae.onnx, results/ort_bench.json
@@ -217,7 +358,8 @@ experiments/
   latent_ablation.py        latent dimension ablation
   benchmark_inference.py    batch / threads / backend / stride / stage timing
   make_article_figures.py   black-and-white figures of the journal article
-models/            trained weights (afp_cae.npz), ONNX model, threshold.json
+models/            trained weights (afp_cae.npz, draem_cae.npz), ONNX models, threshold.json, threshold_draem.json
+models/seeds/      weights of the seed runs
 results/           metrics, benchmarks, training log, figures
 results/article/   results and figures of the extended experiments
 ```
@@ -230,6 +372,10 @@ results/article/   results and figures of the extended experiments
   (fuzzballs, foreign objects) are the main source of misses. A lower quantile in `calibrate.py`
   trades false alarms for recall.
 * Defects are localised but not classified by type.
+* DRAEM-CAE: the results on real scans are a pilot (6 passes of one part, synthetic defects drawn on real
+  backgrounds, 5 seeds; the ensemble and the boundary study 2 and 3 seeds). Its false-alarm rate varies between
+  training runs (an ensemble of 3 models stabilises it); a single model is 3.4 times slower than the CAE, the
+  ensemble 10 times. The parameters of the boundary detectors were fixed once by eye, not tuned.
 * On the synthetic data a training-free directional background subtraction is a strong baseline at the
   instance level; the hybrid detector (`experiments/compare_methods.py`) is recommended until the CAE is
   validated on real scans.

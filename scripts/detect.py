@@ -3,6 +3,7 @@
     python scripts/detect.py --demo                       # synthetic frame with a random defect
     python scripts/detect.py --input scan.npy --normalize --png out.png --json out.json
     python scripts/detect.py --input scan.npy --backend onnx
+    python scripts/detect.py --demo --method draem        # DRAEM-CAE (models/draem_cae.*, threshold_draem.json)
 
 The input is a 2-D array saved with numpy.save: height map across x along the layup direction,
 0.1 mm/px. Values must be in [0, 1] (use --normalize for raw heights; min-max scaling).
@@ -19,9 +20,7 @@ sys.path.insert(0, str(ROOT))
 
 import numpy as np
 
-from afp_cae.model import load_params
-from afp_cae.pipeline import (DEFAULT, anomaly_map, detect, jax_predictor, normalize_scan, onnx_predictor,
-                              preprocess)
+from afp_cae.pipeline import DEFAULT, METHODS, anomaly_map, backend, detect, normalize_scan, preprocess
 from afp_cae.synth import DEFECT_TYPES, make_frame
 
 
@@ -31,11 +30,12 @@ def main():
     src.add_argument("--input", help=".npy height map")
     src.add_argument("--demo", action="store_true", help="use a synthetic frame with a random defect")
     ap.add_argument("--normalize", action="store_true", help="min-max scale the input to [0, 1]")
+    ap.add_argument("--method", choices=list(METHODS), default="cae")
     ap.add_argument("--backend", choices=["jax", "onnx"], default="jax")
-    ap.add_argument("--weights", default=str(ROOT / "models" / "afp_cae.npz"))
-    ap.add_argument("--onnx", default=str(ROOT / "models" / "afp_cae.onnx"))
-    ap.add_argument("--threshold", default=str(ROOT / "models" / "threshold.json"),
-                    help="JSON with key 'tau' or a number")
+    ap.add_argument("--weights", default=None, help="default: models/afp_cae.npz or models/draem_cae.npz")
+    ap.add_argument("--onnx", default=None, help="default: models/afp_cae.onnx or models/draem_cae.onnx")
+    ap.add_argument("--threshold", default=None, help="JSON with key 'tau' or a number "
+                                                      "(default: models/threshold.json or models/threshold_draem.json)")
     ap.add_argument("--seed", type=int, default=None, help="seed for --demo")
     ap.add_argument("--json", help="write detections to this JSON file")
     ap.add_argument("--png", help="save input / anomaly map / detections figure")
@@ -56,14 +56,16 @@ def main():
     if frame.shape[0] < DEFAULT.tile or frame.shape[1] < DEFAULT.tile:
         sys.exit(f"height map must be at least {DEFAULT.tile} x {DEFAULT.tile} px")
 
+    a.threshold = a.threshold or str(ROOT / "models" / f"threshold{METHODS[a.method][1]}.json")
     try:
         tau = float(a.threshold)
     except ValueError:
         tau = float(json.load(open(a.threshold))["tau"])
-    predict = onnx_predictor(a.onnx) if a.backend == "onnx" else jax_predictor(load_params(a.weights))
+    predict, map_kind = backend(a.method, a.weights, onnx=(a.onnx or True) if a.backend == "onnx" else None,
+                                models_dir=ROOT / "models")
 
     x = preprocess(frame)
-    A = anomaly_map(x, predict, DEFAULT)
+    A = anomaly_map(x, predict, DEFAULT, kind=map_kind)
     found = detect(A, tau, DEFAULT)
     print(f"tau = {tau:.4f}; defects found: {len(found)}")
     for d in found:

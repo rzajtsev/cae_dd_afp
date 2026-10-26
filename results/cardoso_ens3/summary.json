@@ -1,0 +1,56 @@
+{
+ "protocol": {
+  "folds": [
+   1,
+   2,
+   3
+  ],
+  "seeds": [
+   0,
+   1
+  ],
+  "trials": 10,
+  "thr_pct": 99.5,
+  "sigma": 3.0
+ },
+ "methods": {
+  "draem_ens3": {
+   "seeds": [
+    0,
+    1
+   ],
+   "defects": 1110,
+   "tile_auroc": 0.8491207073804765,
+   "pixel_auroc": 0.8771847171755393,
+   "detected": 0.672972972972973,
+   "detected_ci95": [
+    0.6459459459459459,
+    0.7
+   ],
+   "detected_by_seed": [
+    0.6576576576576577,
+    0.6882882882882883
+   ],
+   "false_zones_per_m": 30.16588468867067,
+   "false_zones_per_m_by_seed": [
+    27.90011559908705,
+    32.43165377825428
+   ],
+   "detected_by_type": {
+    "gap": 0.8041666666666667,
+    "overlap": 0.8375,
+    "fod": 0.7458333333333333,
+    "twist": 0.5,
+    "wrinkle": 0.3882978723404255
+   },
+   "seams": {
+    "area_share": 0.17519365226413158,
+    "false_zones_per_m_on_seams": 9.19034682174549,
+    "false_zone_share_on_seams": 0.30466027821146874,
+    "defects_on_seams": 164,
+    "detected_on_seams": 0.6951219512195121,
+    "detected_off_seams": 0.6691331923890064
+   }
+  }
+ }
+}

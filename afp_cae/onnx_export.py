@@ -64,3 +64,50 @@ def build_onnx(params) -> onnx.ModelProto:
     model.doc_string = "Convolutional autoencoder for AFP defect detection (input/output: N x 1 x 64 x 64, [0, 1])"
     onnx.checker.check_model(model)
     return model
+
+
+def build_draem_onnx(params) -> onnx.ModelProto:
+    """DRAEM-CAE as one graph x -> amap: the CAE graph of `build_onnx` (output 'xhat') followed by the
+    U-Net of `afp_cae.draem.discriminate` and a sigmoid. Input/output: N x 1 x 64 x 64."""
+    rec = build_onnx(params["rec"])
+    d = params["disc"]
+    nodes, inits = list(rec.graph.node), list(rec.graph.initializer)
+
+    def const(name, arr):
+        inits.append(numpy_helper.from_array(np.asarray(arr), name))
+        return name
+
+    def conv(x, layer, name):
+        w = np.transpose(np.asarray(layer["w"]), (3, 2, 0, 1)).astype(np.float32)   # HWIO -> OIHW
+        k = w.shape[-1]
+        nodes.append(helper.make_node("Conv", [x, const(name + "_w", w), const(name + "_b", np.asarray(layer["b"], np.float32))],
+                                      [name], kernel_shape=[k, k], auto_pad="SAME_UPPER"))
+        return name
+
+    def lrelu(x, name):
+        nodes.append(helper.make_node("LeakyRelu", [x], [name], alpha=NEG_SLOPE))
+        return name
+
+    def op(kind, inputs, name, **kw):
+        nodes.append(helper.make_node(kind, inputs, [name], **kw))
+        return name
+
+    scales = const("q_scales", np.array([1, 1, 2, 2], np.float32))
+    pool = dict(kernel_shape=[2, 2], strides=[2, 2])
+    e1 = lrelu(conv(op("Concat", ["x", "xhat"], "q_in", axis=1), d["e1"], "q_e1"), "q_e1a")
+    e2 = lrelu(conv(op("MaxPool", [e1], "q_p1", **pool), d["e2"], "q_e2"), "q_e2a")
+    e3 = lrelu(conv(op("MaxPool", [e2], "q_p2", **pool), d["e3"], "q_e3"), "q_e3a")
+    u2 = op("Resize", [e3, "", scales], "q_u2", mode="nearest")
+    d2 = lrelu(conv(op("Concat", [u2, e2], "q_c2", axis=1), d["d2"], "q_d2"), "q_d2a")
+    u1 = op("Resize", [d2, "", scales], "q_u1", mode="nearest")
+    d1 = lrelu(conv(op("Concat", [u1, e1], "q_c1", axis=1), d["d1"], "q_d1"), "q_d1a")
+    op("Sigmoid", [conv(d1, d["out"], "q_out")], "amap")
+    graph = helper.make_graph(
+        nodes, "draem_cae",
+        [helper.make_tensor_value_info("x", TensorProto.FLOAT, ["N", 1, TILE, TILE])],
+        [helper.make_tensor_value_info("amap", TensorProto.FLOAT, ["N", 1, TILE, TILE])],
+        inits)
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 17)], ir_version=8)
+    model.doc_string = "DRAEM-CAE for AFP defect detection (input: N x 1 x 64 x 64 heights, output: anomaly probability)"
+    onnx.checker.check_model(model)
+    return model

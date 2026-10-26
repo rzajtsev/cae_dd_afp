@@ -26,7 +26,9 @@ import numpy as np
 from scipy.ndimage import distance_transform_edt, label
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-from afp_cae.model import count_params, load_params, macs_per_tile
+from dataclasses import replace
+
+from afp_cae import draem, model
 from afp_cae.pipeline import DEFAULT, anomaly_map, jax_predictor, preprocess, tile_scores, tiles
 from afp_cae.synth import DEFECT_TYPES, H, PX_MM, make_frame
 
@@ -69,18 +71,29 @@ def bench(fn, n):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--weights", default=str(ROOT / "models" / "afp_cae.npz"))
+    ap.add_argument("--method", choices=["cae", "draem"], default="cae",
+                    help="cae: residual map of the CAE; draem: anomaly map of DRAEM-CAE")
+    ap.add_argument("--weights", default=None,
+                    help="default: models/afp_cae.npz (cae) or models/draem_cae.npz (draem)")
+    ap.add_argument("--sigma", type=float, default=None, help="override the smoothing sigma of the map, px")
     ap.add_argument("--quick", action="store_true", help="10 validation, 10 normal + 4 per type test frames")
-    ap.add_argument("--out", default=None, help="results JSON (default: results/results.json, not written in --quick)")
+    ap.add_argument("--out", default=None, help="results JSON (default: results/results.json or "
+                                                "results/results_draem.json, not written in --quick)")
+    ap.add_argument("--threshold", default=None, help="threshold JSON written with --out "
+                                                      "(default: models/threshold.json or models/threshold_draem.json)")
     a = ap.parse_args()
-    cfg = DEFAULT
+    cfg = DEFAULT if a.sigma is None else replace(DEFAULT, sigma=a.sigma)
     nv, nt, nper = (10, 10, 4) if a.quick else (100, 150, 60)
 
-    params = load_params(a.weights)
-    predict = jax_predictor(params)
+    net = draem if a.method == "draem" else model
+    suffix = "_draem" if a.method == "draem" else ""
+    params = net.load_params(a.weights or str(ROOT / "models" / ("draem_cae.npz" if suffix else "afp_cae.npz")))
+    predict = draem.jax_predictor(params) if a.method == "draem" else jax_predictor(params)
+    map_kind = "map" if a.method == "draem" else "residual"
+    amap = lambda f: anomaly_map(f, predict, cfg, kind=map_kind)
 
     # ---- threshold calibration on defect-free validation frames ----
-    tau = float(max(anomaly_map(f, predict, cfg).max() for _, f, _ in frames(1, nv, 0)))
+    tau = float(max(amap(f).max() for _, f, _ in frames(1, nv, 0)))
     print(f"tau = {tau:.5f}", flush=True)
 
     # ---- test ----
@@ -91,7 +104,7 @@ def main():
     fp_comp = fp_far = normal_alarms = 0
     prng = np.random.default_rng(3)
     for kind, f, m in test:
-        A = anomaly_map(f, predict, cfg)
+        A = amap(f)
         _, ys, xs = tiles(f, cfg.tile, cfg.stride)
         sc = tile_scores(A, ys, xs, cfg.tile)
         i = 0
@@ -159,13 +172,13 @@ def main():
     import jax.numpy as jnp
     x1, xb = jnp.asarray(t[:1, ..., None]), jnp.asarray(t[..., None])
     n1, nb, ne = (50, 20, 10) if a.quick else (500, 200, 100)
-    e2e = bench(lambda: label(anomaly_map(preprocess(f), predict, cfg) > tau), ne)
+    e2e = bench(lambda: label(amap(preprocess(f)) > tau), ne)
     fps = 1e3 / e2e[0]
-    n_par = count_params(params)
+    n_par = net.count_params(params)
     perf = {
         "backend": "JAX/XLA, FP32", "cpu": cpu_name(), "cpu_count": os.cpu_count(),
         "params": n_par, "size_MB_fp32": n_par * 4 / 2 ** 20,
-        "MMAC_per_tile": macs_per_tile() / 1e6, "GFLOP_per_frame": 2 * macs_per_tile() * len(t) / 1e9,
+        "MMAC_per_tile": net.macs_per_tile() / 1e6, "GFLOP_per_frame": 2 * net.macs_per_tile() * len(t) / 1e9,
         "tiles_per_frame": len(t),
         "tile_latency_ms_median_p95": bench(lambda: fwd(x1).block_until_ready(), n1),
         "frame_cae_latency_ms_median_p95": bench(lambda: fwd(xb).block_until_ready(), nb),
@@ -175,11 +188,12 @@ def main():
     perf["tiles_per_s"] = len(t) / (perf["frame_cae_latency_ms_median_p95"][0] / 1e3)
     print(json.dumps(perf, indent=1), flush=True)
 
-    out = a.out or (None if a.quick else str(ROOT / "results" / "results.json"))
+    out = a.out or (None if a.quick else str(ROOT / "results" / f"results{suffix}.json"))
     if out:
         json.dump({"quality": quality, "benchmark_jax": perf}, open(out, "w"), indent=1)
         json.dump({"tau": tau, "calibration": f"max of A over {nv} defect-free validation frames (seed 1)",
-                   "pipeline": cfg.__dict__}, open(ROOT / "models" / "threshold.json", "w"), indent=1)
+                   "method": a.method, "pipeline": cfg.__dict__},
+                  open(a.threshold or ROOT / "models" / f"threshold{suffix}.json", "w"), indent=1)
         print("written", out)
 
 

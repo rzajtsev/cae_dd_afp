@@ -1,0 +1,13 @@
+{
+ "tau": 0.1015685498714447,
+ "calibration": "max of A over 100 defect-free validation frames (seed 1)",
+ "method": "cae",
+ "pipeline": {
+  "tile": 64,
+  "stride": 32,
+  "sigma": 3.0,
+  "edge": 12,
+  "min_area": 20,
+  "px_mm": 0.1
+ }
+}

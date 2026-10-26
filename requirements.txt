@@ -6,3 +6,5 @@ optax>=0.2
 onnx>=1.15
 onnxruntime>=1.17
 matplotlib>=3.8
+pandas>=2.0
+scikit-image>=0.22
